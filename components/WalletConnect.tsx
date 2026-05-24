@@ -74,28 +74,46 @@ export function useWallet() {
       }) as string[];
       setAddress(accounts[0]);
 
-      // Switch to Arbitrum Sepolia
+      // Always try to add Arbitrum Sepolia first, then switch
+      try {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: "0x66EEE",
+            chainName: "Arbitrum Sepolia",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
+            blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+          }],
+        });
+      } catch {
+        // wallet_addEthereumChain may throw if already added — that's fine
+      }
+
+      // Now switch to it
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x66EEE" }], // 421614
+          params: [{ chainId: "0x66EEE" }], // Arbitrum Sepolia 421614
         });
       } catch (switchErr: unknown) {
-        // Chain not added — add it
-        if ((switchErr as { code: number }).code === 4902) {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-              chainId: "0x66EEE",
-              chainName: "Arbitrum Sepolia",
-              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
-              blockExplorerUrls: ["https://sepolia.arbiscan.io"],
-            }],
-          });
+        const code = (switchErr as { code?: number }).code;
+        if (code !== 4001) {
+          // Not user-rejected — show warning but don't block
+          toast.error("Please switch to Arbitrum Sepolia in MetaMask");
         }
       }
-      toast.success("Wallet connected!");
+
+      // Verify we are on the right chain
+      const currentChain = await window.ethereum.request({ method: "eth_chainId" }) as string;
+      const currentChainId = parseInt(currentChain, 16);
+      setChainId(currentChainId);
+
+      if (currentChainId !== 421614) {
+        toast.error("Wrong network — please switch to Arbitrum Sepolia (Chain ID 421614)");
+      } else {
+        toast.success("Wallet connected to Arbitrum Sepolia!");
+      }
     } catch (err: unknown) {
       if ((err as { code: number }).code !== 4001) {
         toast.error("Failed to connect wallet");
@@ -110,13 +128,36 @@ export function useWallet() {
     toast.success("Wallet disconnected");
   };
 
+  const switchToArbitrum = async () => {
+    if (!window.ethereum) return;
+    try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: "0x66EEE",
+          chainName: "Arbitrum Sepolia",
+          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+          rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
+          blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+        }],
+      });
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x66EEE" }],
+      });
+      toast.success("Switched to Arbitrum Sepolia!");
+    } catch {
+      toast.error("Could not switch network — please switch manually in MetaMask");
+    }
+  };
+
   const isCorrectChain = chainId === REQUIRED_CHAIN;
 
-  return { address, chainId, loading, connect, disconnect, isCorrectChain };
+  return { address, chainId, loading, connect, disconnect, switchToArbitrum, isCorrectChain };
 }
 
 export default function WalletConnect({ className, compact = false }: WalletConnectProps) {
-  const { address, loading, connect, disconnect, isCorrectChain } = useWallet();
+  const { address, loading, connect, disconnect, switchToArbitrum, isCorrectChain } = useWallet();
   const [copied, setCopied] = useState(false);
 
   const copyAddress = async () => {
@@ -151,9 +192,12 @@ export default function WalletConnect({ className, compact = false }: WalletConn
     return (
       <div className={cn("flex items-center gap-2", className)}>
         {!isCorrectChain && (
-          <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full">
-            Wrong Network
-          </span>
+          <button
+            onClick={switchToArbitrum}
+            className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full border border-yellow-400/20 hover:bg-yellow-400/20 transition-all"
+          >
+            ⚠ Switch to Arbitrum Sepolia
+          </button>
         )}
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-300">
           <div className="w-2 h-2 rounded-full bg-emerald-400" />
@@ -164,14 +208,17 @@ export default function WalletConnect({ className, compact = false }: WalletConn
   }
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex flex-col gap-2", className)}>
       {!isCorrectChain && (
-        <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full border border-yellow-400/20">
-          Wrong Network
-        </span>
+        <button
+          onClick={switchToArbitrum}
+          className="text-xs text-yellow-400 bg-yellow-400/10 px-3 py-1.5 rounded-full border border-yellow-400/20 hover:bg-yellow-400/20 transition-all w-fit"
+        >
+          ⚠ Wrong Network — Click to Switch to Arbitrum Sepolia
+        </button>
       )}
       <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-        <div className="w-2 h-2 rounded-full bg-emerald-400 mr-1" />
+        <div className={cn("w-2 h-2 rounded-full mr-1", isCorrectChain ? "bg-emerald-400" : "bg-yellow-400")} />
         <span className="text-sm text-gray-300 font-mono">{shortenAddress(address)}</span>
         <button onClick={copyAddress} className="ml-1 p-1 hover:text-cyan-400 transition-colors text-gray-500">
           {copied ? <CheckCheck className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
