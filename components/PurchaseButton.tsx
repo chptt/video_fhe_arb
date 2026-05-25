@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Zap, Loader2, ShieldCheck } from "lucide-react";
-import { cn, formatWeiToEth } from "@/lib/utils";
+import { cn, formatWeiToBtc } from "@/lib/utils";
 import { useWallet } from "./WalletConnect";
 import toast from "react-hot-toast";
 
@@ -32,7 +32,7 @@ export default function PurchaseButton({
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"idle" | "confirm" | "pending" | "done">("idle");
 
-  const priceEth = formatWeiToEth(priceWei, 6);
+  const priceBtc = formatWeiToBtc(priceWei, 8);
 
   const handlePurchase = async () => {
     if (!address) {
@@ -53,7 +53,7 @@ export default function PurchaseButton({
       toast.loading("Waiting for transaction confirmation...", { id: "purchase" });
 
       // Convert priceWei to string for ethers v6 compatibility
-      // Set explicit gasLimit to bypass estimation failures on Arbitrum
+      // Set explicit gasLimit to bypass estimation failures on Mezo
       const tx = await contract.purchaseAccess(campaignId, {
         value: priceWei.toString(),
         gasLimit: 300000,
@@ -71,9 +71,9 @@ export default function PurchaseButton({
       } else if (e.reason) {
         toast.error(`Purchase failed: ${e.reason}`);
       } else if (e.message?.includes("insufficient funds")) {
-        toast.error("Insufficient ETH balance to purchase");
+        toast.error("Insufficient BTC balance to purchase");
       } else {
-        toast.error("Purchase failed — check you have enough ETH and are on Arbitrum Sepolia");
+        toast.error("Purchase failed — check you have enough BTC and are on Mezo Testnet");
         console.error(err);
       }
       setStep("idle");
@@ -121,7 +121,7 @@ export default function PurchaseButton({
       ) : (
         <>
           <Zap className="w-4 h-4" />
-          {address ? `Pay ${priceEth} ETH` : "Connect Wallet to Purchase"}
+          {address ? `Pay ${priceBtc} BTC` : "Connect Wallet to Purchase"}
         </>
       )}
     </motion.button>

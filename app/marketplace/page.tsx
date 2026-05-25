@@ -23,7 +23,7 @@ export default function MarketplacePage() {
       const mapped: CampaignCardData[] = data.campaigns.map((c: {
         id: number; title: string; description: string; creator: string;
         priceWei: string; durationSeconds: number; totalRevenueWei: string;
-        revenueCapWei: string; active: boolean; soldOut: boolean; ethUsdPrice: number;
+        revenueCapWei: string; active: boolean; soldOut: boolean; btcUsdPrice: number;
       }) => ({
         id:              c.id,
         title:           c.title,
@@ -35,7 +35,7 @@ export default function MarketplacePage() {
         revenueCapWei:   BigInt(c.revenueCapWei),
         active:          c.active,
         soldOut:         c.soldOut,
-        ethUsdPrice:     c.ethUsdPrice,
+        btcUsdPrice:     c.btcUsdPrice,
       }));
 
       setCampaigns(mapped);
@@ -83,7 +83,7 @@ export default function MarketplacePage() {
         <EmptyState
           icon={Store}
           title="No active campaigns"
-          description="Be the first to create an encrypted video campaign on PrivateStream FHE."
+          description="Be the first to create an encrypted video campaign on PrivateStream Mezo."
           action={
             <a
               href="/campaign/create"

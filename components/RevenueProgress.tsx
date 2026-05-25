@@ -7,7 +7,7 @@ import { REVENUE_CAP_USD } from "@/lib/constants";
 interface RevenueProgressProps {
   totalRevenueWei: bigint;
   revenueCapWei: bigint;
-  ethUsdPrice?: number;
+  btcUsdPrice?: number;
   showLabels?: boolean;
   className?: string;
 }
@@ -15,14 +15,14 @@ interface RevenueProgressProps {
 export default function RevenueProgress({
   totalRevenueWei,
   revenueCapWei,
-  ethUsdPrice = 3000,
+  btcUsdPrice = 100000,
   showLabels = true,
   className,
 }: RevenueProgressProps) {
   const capWei = revenueCapWei > 0n ? revenueCapWei : 1n;
   const pct = Math.min(100, (Number(totalRevenueWei) / Number(capWei)) * 100);
 
-  const earnedUsd = (Number(totalRevenueWei) / 1e18) * ethUsdPrice;
+  const earnedUsd = (Number(totalRevenueWei) / 1e18) * btcUsdPrice;
   const capUsd    = REVENUE_CAP_USD;
 
   const color =

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyTransaction } from "@/lib/arbitrum";
+import { verifyTransaction } from "@/lib/mezo";
 import { validateTxHash, validateEthAddress } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {

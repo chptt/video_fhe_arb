@@ -1,17 +1,17 @@
 /**
- * Application-wide constants for PrivateStream FHE.
+ * Application-wide constants for PrivateStream Mezo.
  * All blockchain-specific values are sourced from environment variables.
  */
 
-export const APP_NAME = "PrivateStream FHE";
+export const APP_NAME = "PrivateStream Mezo";
 export const APP_DESCRIPTION =
-  "Privacy-preserving encrypted video access platform on Arbitrum";
+  "Privacy-preserving encrypted video access platform on Mezo";
 
 // ── Blockchain ──────────────────────────────────────────────────────────────
-export const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 421614;
+export const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 31611;
 export const RPC_URL =
   process.env.NEXT_PUBLIC_RPC_URL ||
-  "https://sepolia-rollup.arbitrum.io/rpc";
+  "https://rpc.mezzo.xyz";
 export const CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "";
 
@@ -19,7 +19,7 @@ export const CONTRACT_ADDRESS =
 export const REVENUE_CAP_USD = Number(process.env.REVENUE_CAP_USD) || 20;
 export const PLATFORM_FEE_PERCENTAGE =
   Number(process.env.PLATFORM_FEE_PERCENTAGE) || 10;
-export const ETH_USD_FALLBACK = Number(process.env.ETH_USD_FALLBACK) || 3000;
+export const BTC_USD_FALLBACK = Number(process.env.BTC_USD_FALLBACK) || 100000;
 
 // ── IPFS ─────────────────────────────────────────────────────────────────────
 export const PINATA_GATEWAY =
@@ -30,19 +30,19 @@ export const DEFAULT_ACCESS_DURATION_SECONDS = 86400; // 24 hours
 export const MIN_ACCESS_DURATION_SECONDS = 3600;      // 1 hour
 export const MAX_ACCESS_DURATION_SECONDS = 2592000;   // 30 days
 
-// ── Arbitrum Sepolia chain config (for wagmi) ────────────────────────────────
-export const ARBITRUM_SEPOLIA = {
-  id: 421614,
-  name: "Arbitrum Sepolia",
-  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+// ── Mezo Testnet chain config (for wagmi) ────────────────────────────────
+export const MEZO_TESTNET = {
+  id: 31611,
+  name: "Mezo Testnet",
+  nativeCurrency: { name: "Bitcoin", symbol: "BTC", decimals: 18 },
   rpcUrls: {
     default: { http: [RPC_URL] },
     public:  { http: [RPC_URL] },
   },
   blockExplorers: {
     default: {
-      name: "Arbiscan",
-      url: "https://sepolia.arbiscan.io",
+      name: "Mezo Explorer",
+      url: "https://explorer.mezzo.xyz",
     },
   },
   testnet: true,

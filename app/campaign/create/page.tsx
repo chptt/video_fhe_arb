@@ -25,22 +25,28 @@ export default function CreateCampaignPage() {
   const router = useRouter();
   const { address, connect } = useWallet();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string;
+    description: string;
+    videoUrl: string;
+    priceBtc: string;
+    durationSeconds: number;
+  }>({
     title: "",
     description: "",
     videoUrl: "",
-    priceEth: "",
+    priceBtc: "",
     durationSeconds: 86400,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [step, setStep] = useState<"form" | "encrypting" | "uploading" | "confirming" | "done">("form");
   const [checking, setChecking] = useState(false);
   const [alreadyHasCampaign, setAlreadyHasCampaign] = useState(false);
-  const [ethUsdPrice, setEthUsdPrice] = useState(3000);
+  const [btcUsdPrice, setBtcUsdPrice] = useState(100000);
 
-  // Check eligibility and fetch ETH price
+  // Check eligibility and fetch BTC price
   useEffect(() => {
-    fetch("/api/pricing").then(r => r.json()).then(d => setEthUsdPrice(d.ethUsdPrice || 3000));
+    fetch("/api/pricing").then(r => r.json()).then(d => setBtcUsdPrice(d.btcUsdPrice || 100000));
   }, []);
 
   useEffect(() => {
@@ -65,7 +71,7 @@ export default function CreateCampaignPage() {
       ["title",       validateCampaignTitle(form.title)],
       ["description", validateDescription(form.description)],
       ["videoUrl",    validateYouTubeUrl(form.videoUrl)],
-      ["priceEth",    validatePrice(form.priceEth)],
+      ["priceBtc",    validatePrice(form.priceBtc)],
     ] as const;
     for (const [field, result] of checks) {
       if (!result.valid) newErrors[field] = result.error!;
@@ -82,7 +88,7 @@ export default function CreateCampaignPage() {
     try {
       // Step 1: Encrypt & upload to IPFS
       setStep("encrypting");
-      const priceWei = BigInt(Math.floor(parseFloat(form.priceEth) * 1e18)).toString();
+      const priceWei = BigInt(Math.floor(parseFloat(form.priceBtc) * 1e18)).toString();
 
       const uploadRes = await fetch("/api/ipfs/upload", {
         method: "POST",
@@ -132,7 +138,7 @@ export default function CreateCampaignPage() {
     }
   };
 
-  const priceUsd = form.priceEth ? (parseFloat(form.priceEth) * ethUsdPrice).toFixed(2) : "0.00";
+  const priceUsd = form.priceBtc ? (parseFloat(form.priceBtc) * btcUsdPrice).toFixed(2) : "0.00";
 
   if (!address) {
     return (
@@ -260,19 +266,19 @@ export default function CreateCampaignPage() {
               type="number"
               step="0.0001"
               min="0.0001"
-              value={form.priceEth}
-              onChange={e => setForm(f => ({ ...f, priceEth: e.target.value }))}
+              value={form.priceBtc}
+              onChange={e => setForm(f => ({ ...f, priceBtc: e.target.value }))}
               placeholder="0.001"
               disabled={isProcessing}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 transition-colors disabled:opacity-50"
             />
-            {form.priceEth && (
+            {form.priceBtc && (
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500">
                 ≈ ${priceUsd}
               </span>
             )}
           </div>
-          {errors.priceEth && <p className="text-red-400 text-xs mt-1">{errors.priceEth}</p>}
+          {errors.priceBtc && <p className="text-red-400 text-xs mt-1">{errors.priceBtc}</p>}
         </div>
 
         {/* Duration */}

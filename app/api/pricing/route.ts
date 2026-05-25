@@ -4,15 +4,15 @@
  */
 
 import { NextResponse } from "next/server";
-import { getEthUsdPrice, revenueCapWei } from "@/lib/pricing";
+import { getBtcUsdPrice, revenueCapWei } from "@/lib/pricing";
 
 export async function GET() {
   try {
-    const ethUsdPrice = await getEthUsdPrice();
-    const capWei      = revenueCapWei(ethUsdPrice);
+    const btcUsdPrice = await getBtcUsdPrice();
+    const capWei      = revenueCapWei(btcUsdPrice);
 
     return NextResponse.json({
-      ethUsdPrice,
+      btcUsdPrice,
       revenueCapWei: capWei.toString(),
       revenueCapUsd: Number(process.env.REVENUE_CAP_USD) || 20,
       platformFeePercentage: Number(process.env.PLATFORM_FEE_PERCENTAGE) || 10,

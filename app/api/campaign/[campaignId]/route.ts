@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getFullCampaign } from "@/lib/campaignRegistry";
-import { getEthUsdPrice } from "@/lib/pricing";
+import { getBtcUsdPrice } from "@/lib/pricing";
 import { REVENUE_CAP_USD } from "@/lib/constants";
 
 export async function GET(
@@ -19,16 +19,16 @@ export async function GET(
       return NextResponse.json({ error: "Invalid campaign ID" }, { status: 400 });
     }
 
-    const [campaign, ethUsdPrice] = await Promise.all([
+    const [campaign, btcUsdPrice] = await Promise.all([
       getFullCampaign(id),
-      getEthUsdPrice(),
+      getBtcUsdPrice(),
     ]);
 
     if (!campaign) {
       return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
     }
 
-    const revenueCapWeiVal = BigInt(Math.floor((REVENUE_CAP_USD / ethUsdPrice) * 1e18));
+    const revenueCapWeiVal = BigInt(Math.floor((REVENUE_CAP_USD / btcUsdPrice) * 1e18));
 
     // Return only public fields — never expose encrypted video URL
     return NextResponse.json({
@@ -43,7 +43,7 @@ export async function GET(
       active:          campaign.onChain.active,
       soldOut:         campaign.onChain.soldOut,
       createdAt:       campaign.metadata.createdAt,
-      ethUsdPrice,
+      btcUsdPrice,
     });
   } catch (err) {
     console.error("[campaign/get] Error:", err);

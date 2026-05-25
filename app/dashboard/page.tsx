@@ -8,7 +8,7 @@ import { useWallet } from "@/components/WalletConnect";
 import WalletConnect from "@/components/WalletConnect";
 import RevenueProgress from "@/components/RevenueProgress";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { shortenAddress, formatWeiToEth, formatDuration } from "@/lib/utils";
+import { shortenAddress, formatWeiToBtc, formatDuration } from "@/lib/utils";
 import { PLATFORM_FEE_PERCENTAGE, REVENUE_CAP_USD, CONTRACT_ADDRESS, CONTRACT_ABI } from "@/lib/constants";
 import toast from "react-hot-toast";
 
@@ -35,10 +35,10 @@ export default function DashboardPage() {
   const [loading, setLoading]     = useState(false);
   const [noCampaign, setNoCampaign] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
-  const [ethUsdPrice, setEthUsdPrice] = useState(3000);
+  const [btcUsdPrice, setBtcUsdPrice] = useState(100000);
 
   useEffect(() => {
-    fetch("/api/pricing").then(r => r.json()).then(d => setEthUsdPrice(d.ethUsdPrice || 3000));
+    fetch("/api/pricing").then(r => r.json()).then(d => setBtcUsdPrice(d.btcUsdPrice || 100000));
   }, []);
 
   useEffect(() => {
@@ -131,14 +131,14 @@ export default function DashboardPage() {
   const platformWei = (grossWei * BigInt(PLATFORM_FEE_PERCENTAGE)) / 100n;
   const creatorWei  = grossWei - platformWei;
 
-  const grossUsd    = ((Number(grossWei) / 1e18) * ethUsdPrice).toFixed(2);
-  const creatorUsd  = ((Number(creatorWei) / 1e18) * ethUsdPrice).toFixed(2);
-  const platformUsd = ((Number(platformWei) / 1e18) * ethUsdPrice).toFixed(2);
+  const grossUsd    = ((Number(grossWei) / 1e18) * btcUsdPrice).toFixed(2);
+  const creatorUsd  = ((Number(creatorWei) / 1e18) * btcUsdPrice).toFixed(2);
+  const platformUsd = ((Number(platformWei) / 1e18) * btcUsdPrice).toFixed(2);
 
   const stats = [
-    { label: "Gross Revenue",    value: `$${grossUsd}`,    sub: `${formatWeiToEth(grossWei, 6)} ETH`,    color: "text-cyan-400" },
-    { label: "Your Earnings",    value: `$${creatorUsd}`,  sub: `${formatWeiToEth(creatorWei, 6)} ETH`,  color: "text-emerald-400" },
-    { label: "Platform Fees",    value: `$${platformUsd}`, sub: `${formatWeiToEth(platformWei, 6)} ETH`, color: "text-purple-400" },
+    { label: "Gross Revenue",    value: `$${grossUsd}`,    sub: `${formatWeiToBtc(grossWei, 8)} BTC`,    color: "text-cyan-400" },
+    { label: "Your Earnings",    value: `$${creatorUsd}`,  sub: `${formatWeiToBtc(creatorWei, 8)} BTC`,  color: "text-emerald-400" },
+    { label: "Platform Fees",    value: `$${platformUsd}`, sub: `${formatWeiToBtc(platformWei, 8)} BTC`, color: "text-purple-400" },
     { label: "Revenue Cap",      value: `$${REVENUE_CAP_USD}`,  sub: "Gross limit",                      color: "text-yellow-400" },
   ];
 
@@ -212,7 +212,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
           <div className="bg-white/3 rounded-lg p-3">
             <p className="text-gray-500 text-xs">Price</p>
-            <p className="text-white font-medium">{formatWeiToEth(BigInt(campaign.priceWei), 6)} ETH</p>
+            <p className="text-white font-medium">{formatWeiToBtc(BigInt(campaign.priceWei), 8)} BTC</p>
           </div>
           <div className="bg-white/3 rounded-lg p-3">
             <p className="text-gray-500 text-xs">Duration</p>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
           <RevenueProgress
             totalRevenueWei={BigInt(campaign.totalRevenueWei)}
             revenueCapWei={BigInt(campaign.revenueCapWei)}
-            ethUsdPrice={ethUsdPrice}
+            btcUsdPrice={btcUsdPrice}
           />
         </div>
 

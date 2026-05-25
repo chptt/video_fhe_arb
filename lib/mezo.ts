@@ -1,12 +1,13 @@
 /**
- * lib/arbitrum.ts
- * Server-side ethers.js helpers for reading from Arbitrum Sepolia.
+ * lib/mezo.ts
+ * Server-side ethers.js helpers for reading from Mezo.
+ * (Replaces lib/arbitrum.ts — same logic, Mezo RPC endpoint)
  */
 
 import { ethers } from "ethers";
 import { CONTRACT_ABI, CONTRACT_ADDRESS, RPC_URL } from "./constants";
 
-/** Returns a read-only provider connected to Arbitrum Sepolia */
+/** Returns a read-only provider connected to Mezo */
 export function getProvider(): ethers.JsonRpcProvider {
   return new ethers.JsonRpcProvider(RPC_URL);
 }

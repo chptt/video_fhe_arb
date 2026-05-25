@@ -11,7 +11,7 @@
  *   - Wallet-gated decryption (only the buyer's address can request decryption)
  */
 
-import { checkAccessOnChain } from "./arbitrum";
+import { checkAccessOnChain } from "./mezo";
 
 export interface AccessCheckResult {
   hasAccess: boolean;

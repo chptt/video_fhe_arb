@@ -4,10 +4,10 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PrivateStream FHE — Encrypted Video Access on Arbitrum",
+  title: "PrivateStream Mezo — Encrypted Video Access on Mezo",
   description:
-    "Privacy-preserving encrypted video access platform using FHE-inspired architecture on Arbitrum Sepolia.",
-  keywords: ["FHE", "Arbitrum", "encrypted video", "Web3", "privacy", "blockchain"],
+    "Privacy-preserving encrypted video access platform using FHE-inspired architecture on Mezo Testnet.",
+  keywords: ["FHE", "Mezo", "encrypted video", "Web3", "privacy", "blockchain"],
 };
 
 export default function RootLayout({

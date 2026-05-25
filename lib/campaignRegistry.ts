@@ -8,7 +8,7 @@
  * For production scale, replace the in-memory cache with Redis or a DB.
  */
 
-import { fetchCampaignOnChain, getTotalCampaigns, OnChainCampaign } from "./arbitrum";
+import { fetchCampaignOnChain, getTotalCampaigns, OnChainCampaign } from "./mezo";
 import { fetchFromIPFS } from "./ipfs";
 
 export interface CampaignMetadata {

@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc";
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://rpc.mezzo.xyz";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -18,10 +18,10 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    arbitrumSepolia: {
+    mezoTestnet: {
       type: "http",
       url: RPC_URL,
-      chainId: 421614,
+      chainId: 31611,
       accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
     },
     hardhat: {

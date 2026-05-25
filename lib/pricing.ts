@@ -1,40 +1,40 @@
 /**
  * lib/pricing.ts
- * ETH/USD conversion utilities for revenue cap enforcement.
+ * BTC/USD conversion utilities for revenue cap enforcement.
  */
 
-import { ETH_USD_FALLBACK, REVENUE_CAP_USD, PLATFORM_FEE_PERCENTAGE } from "./constants";
+import { BTC_USD_FALLBACK, REVENUE_CAP_USD, PLATFORM_FEE_PERCENTAGE } from "./constants";
 
-/** Fetch live ETH/USD price from CoinGecko (server-side only). Falls back to env var. */
-export async function getEthUsdPrice(): Promise<number> {
+/** Fetch live BTC/USD price from CoinGecko (server-side only). Falls back to env var. */
+export async function getBtcUsdPrice(): Promise<number> {
   try {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
       { next: { revalidate: 300 } } // cache 5 min in Next.js
     );
     if (!res.ok) throw new Error("CoinGecko fetch failed");
     const data = await res.json();
-    return data?.ethereum?.usd ?? ETH_USD_FALLBACK;
+    return data?.bitcoin?.usd ?? BTC_USD_FALLBACK;
   } catch {
-    return ETH_USD_FALLBACK;
+    return BTC_USD_FALLBACK;
   }
 }
 
-/** Convert wei to USD using provided ETH price */
-export function weiToUsd(weiAmount: bigint, ethUsdPrice: number): number {
-  const eth = Number(weiAmount) / 1e18;
-  return eth * ethUsdPrice;
+/** Convert wei to USD using provided BTC price */
+export function weiToUsd(weiAmount: bigint, btcUsdPrice: number): number {
+  const btc = Number(weiAmount) / 1e18;
+  return btc * btcUsdPrice;
 }
 
-/** Convert USD to wei using provided ETH price */
-export function usdToWei(usdAmount: number, ethUsdPrice: number): bigint {
-  const eth = usdAmount / ethUsdPrice;
-  return BigInt(Math.floor(eth * 1e18));
+/** Convert USD to wei using provided BTC price */
+export function usdToWei(usdAmount: number, btcUsdPrice: number): bigint {
+  const btc = usdAmount / btcUsdPrice;
+  return BigInt(Math.floor(btc * 1e18));
 }
 
-/** Revenue cap in wei given current ETH price */
-export function revenueCapWei(ethUsdPrice: number): bigint {
-  return usdToWei(REVENUE_CAP_USD, ethUsdPrice);
+/** Revenue cap in wei given current BTC price */
+export function revenueCapWei(btcUsdPrice: number): bigint {
+  return usdToWei(REVENUE_CAP_USD, btcUsdPrice);
 }
 
 /** Calculate creator earnings and platform fee from gross revenue */
@@ -44,15 +44,15 @@ export function splitRevenue(grossWei: bigint): { creatorWei: bigint; platformWe
   return { creatorWei, platformWei };
 }
 
-/** Format wei as ETH string with 6 decimal places */
-export function formatEth(weiAmount: bigint): string {
-  const eth = Number(weiAmount) / 1e18;
-  return eth.toFixed(6);
+/** Format wei as BTC string with 8 decimal places */
+export function formatBtc(weiAmount: bigint): string {
+  const btc = Number(weiAmount) / 1e18;
+  return btc.toFixed(8);
 }
 
 /** Format wei as USD string */
-export function formatUsd(weiAmount: bigint, ethUsdPrice: number): string {
-  return weiToUsd(weiAmount, ethUsdPrice).toFixed(2);
+export function formatUsd(weiAmount: bigint, btcUsdPrice: number): string {
+  return weiToUsd(weiAmount, btcUsdPrice).toFixed(2);
 }
 
 /** Percentage of revenue cap consumed (0–100) */

@@ -55,14 +55,19 @@ export function formatDuration(seconds: number): string {
   return `${Math.floor(seconds / 86400)} days`;
 }
 
-/** Parse ETH string to wei bigint */
-export function parseEthToWei(ethStr: string): bigint {
-  const eth = parseFloat(ethStr);
-  if (isNaN(eth)) return 0n;
-  return BigInt(Math.floor(eth * 1e18));
+/** Parse BTC string to wei bigint */
+export function parseBtcToWei(btcStr: string): bigint {
+  const btc = parseFloat(btcStr);
+  if (isNaN(btc)) return 0n;
+  return BigInt(Math.floor(btc * 1e18));
 }
 
-/** Format wei bigint to ETH string */
+/** Format wei bigint to BTC string */
+export function formatWeiToBtc(wei: bigint, decimals = 8): string {
+  return (Number(wei) / 1e18).toFixed(decimals);
+}
+
+/** Format wei bigint to ETH string (backwards compatibility) */
 export function formatWeiToEth(wei: bigint, decimals = 6): string {
   return (Number(wei) / 1e18).toFixed(decimals);
 }

@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { checkHasCampaign } from "@/lib/arbitrum";
+import { checkHasCampaign } from "@/lib/mezo";
 import { validateEthAddress } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {

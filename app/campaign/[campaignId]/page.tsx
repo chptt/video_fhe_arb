@@ -10,7 +10,7 @@ import PurchaseButton from "@/components/PurchaseButton";
 import RevenueProgress from "@/components/RevenueProgress";
 import AccessBadge from "@/components/AccessBadge";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { shortenAddress, formatDuration, formatWeiToEth } from "@/lib/utils";
+import { shortenAddress, formatDuration, formatWeiToBtc } from "@/lib/utils";
 import { CONTRACT_ADDRESS, REVENUE_CAP_USD } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 
@@ -26,7 +26,7 @@ interface CampaignData {
   active: boolean;
   soldOut: boolean;
   createdAt: string;
-  ethUsdPrice: number;
+  btcUsdPrice: number;
 }
 
 interface AccessData {
@@ -82,9 +82,9 @@ export default function CampaignDetailPage() {
     );
   }
 
-  const priceEth = formatWeiToEth(BigInt(campaign.priceWei), 6);
-  const priceUsd = ((Number(campaign.priceWei) / 1e18) * campaign.ethUsdPrice).toFixed(2);
-  const earnedUsd = ((Number(campaign.totalRevenueWei) / 1e18) * campaign.ethUsdPrice).toFixed(2);
+  const priceBtc = formatWeiToBtc(BigInt(campaign.priceWei), 8);
+  const priceUsd = ((Number(campaign.priceWei) / 1e18) * campaign.btcUsdPrice).toFixed(2);
+  const earnedUsd = ((Number(campaign.totalRevenueWei) / 1e18) * campaign.btcUsdPrice).toFixed(2);
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
@@ -130,7 +130,7 @@ export default function CampaignDetailPage() {
                 <Zap className="w-3.5 h-3.5" />
                 Access Price
               </div>
-              <div className="text-white font-semibold">{priceEth} ETH</div>
+              <div className="text-white font-semibold">{priceBtc} BTC</div>
               <div className="text-gray-500 text-xs">≈ ${priceUsd}</div>
             </div>
             <div className="glass rounded-xl p-4">
@@ -166,7 +166,7 @@ export default function CampaignDetailPage() {
             <RevenueProgress
               totalRevenueWei={BigInt(campaign.totalRevenueWei)}
               revenueCapWei={BigInt(campaign.revenueCapWei)}
-              ethUsdPrice={campaign.ethUsdPrice}
+              btcUsdPrice={campaign.btcUsdPrice}
             />
           </div>
 
@@ -198,7 +198,7 @@ export default function CampaignDetailPage() {
             ) : (
               <>
                 <div className="text-center py-2">
-                  <div className="text-2xl font-bold text-white">{priceEth} ETH</div>
+                  <div className="text-2xl font-bold text-white">{priceBtc} BTC</div>
                   <div className="text-gray-500 text-sm">≈ ${priceUsd}</div>
                 </div>
 

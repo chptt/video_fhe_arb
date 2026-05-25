@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyTransaction } from "@/lib/arbitrum";
+import { verifyTransaction } from "@/lib/mezo";
 import { getFullCampaign } from "@/lib/campaignRegistry";
 import { validateEthAddress, validateTxHash } from "@/lib/validation";
 

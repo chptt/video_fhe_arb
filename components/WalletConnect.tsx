@@ -27,7 +27,7 @@ export function useWallet() {
   const [chainId, setChainId]   = useState<number | null>(null);
   const [loading, setLoading]   = useState(false);
 
-  const REQUIRED_CHAIN = 421614;
+  const REQUIRED_CHAIN = 31611;
 
   useEffect(() => {
     // Restore session only if user hasn't manually disconnected
@@ -79,16 +79,16 @@ export function useWallet() {
       }) as string[];
       setAddress(accounts[0]);
 
-      // Always try to add Arbitrum Sepolia first, then switch
+      // Always try to add Mezo Testnet first, then switch
       try {
         await window.ethereum.request({
           method: "wallet_addEthereumChain",
           params: [{
-            chainId: "0x66EEE",
-            chainName: "Arbitrum Sepolia",
-            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-            rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
-            blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+            chainId: "0x7B5B",
+            chainName: "Mezo Testnet",
+            nativeCurrency: { name: "Bitcoin", symbol: "BTC", decimals: 18 },
+            rpcUrls: ["https://rpc.mezzo.xyz"],
+            blockExplorerUrls: ["https://explorer.mezzo.xyz"],
           }],
         });
       } catch {
@@ -99,13 +99,13 @@ export function useWallet() {
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x66EEE" }], // Arbitrum Sepolia 421614
+          params: [{ chainId: "0x7B5B" }], // Mezo Testnet 31611
         });
       } catch (switchErr: unknown) {
         const code = (switchErr as { code?: number }).code;
         if (code !== 4001) {
           // Not user-rejected — show warning but don't block
-          toast.error("Please switch to Arbitrum Sepolia in MetaMask");
+          toast.error("Please switch to Mezo Testnet in MetaMask");
         }
       }
 
@@ -114,10 +114,10 @@ export function useWallet() {
       const currentChainId = parseInt(currentChain, 16);
       setChainId(currentChainId);
 
-      if (currentChainId !== 421614) {
-        toast.error("Wrong network — please switch to Arbitrum Sepolia (Chain ID 421614)");
+      if (currentChainId !== 31611) {
+        toast.error("Wrong network — please switch to Mezo Testnet (Chain ID 31611)");
       } else {
-        toast.success("Wallet connected to Arbitrum Sepolia!");
+        toast.success("Wallet connected to Mezo Testnet!");
       }
     } catch (err: unknown) {
       if ((err as { code: number }).code !== 4001) {
@@ -137,24 +137,24 @@ export function useWallet() {
     toast.success("Wallet disconnected");
   };
 
-  const switchToArbitrum = async () => {
+  const switchToMezo = async () => {
     if (!window.ethereum) return;
     try {
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
         params: [{
-          chainId: "0x66EEE",
-          chainName: "Arbitrum Sepolia",
-          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-          rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
-          blockExplorerUrls: ["https://sepolia.arbiscan.io"],
+          chainId: "0x7B5B",
+          chainName: "Mezo Testnet",
+          nativeCurrency: { name: "Bitcoin", symbol: "BTC", decimals: 18 },
+          rpcUrls: ["https://rpc.mezzo.xyz"],
+          blockExplorerUrls: ["https://explorer.mezzo.xyz"],
         }],
       });
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x66EEE" }],
+        params: [{ chainId: "0x7B5B" }],
       });
-      toast.success("Switched to Arbitrum Sepolia!");
+      toast.success("Switched to Mezo Testnet!");
     } catch {
       toast.error("Could not switch network — please switch manually in MetaMask");
     }
@@ -162,11 +162,11 @@ export function useWallet() {
 
   const isCorrectChain = chainId === REQUIRED_CHAIN;
 
-  return { address, chainId, loading, connect, disconnect, switchToArbitrum, isCorrectChain };
+  return { address, chainId, loading, connect, disconnect, switchToMezo, isCorrectChain };
 }
 
 export default function WalletConnect({ className, compact = false }: WalletConnectProps) {
-  const { address, loading, connect, disconnect, switchToArbitrum, isCorrectChain } = useWallet();
+  const { address, loading, connect, disconnect, switchToMezo, isCorrectChain } = useWallet();
   const [copied, setCopied] = useState(false);
 
   const copyAddress = async () => {
@@ -202,10 +202,10 @@ export default function WalletConnect({ className, compact = false }: WalletConn
       <div className={cn("flex items-center gap-2", className)}>
         {!isCorrectChain && (
           <button
-            onClick={switchToArbitrum}
+            onClick={switchToMezo}
             className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full border border-yellow-400/20 hover:bg-yellow-400/20 transition-all"
           >
-            ⚠ Switch to Arbitrum Sepolia
+            ⚠ Switch to Mezo Testnet
           </button>
         )}
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-300">
@@ -220,10 +220,10 @@ export default function WalletConnect({ className, compact = false }: WalletConn
     <div className={cn("flex flex-col gap-2", className)}>
       {!isCorrectChain && (
         <button
-          onClick={switchToArbitrum}
+          onClick={switchToMezo}
           className="text-xs text-yellow-400 bg-yellow-400/10 px-3 py-1.5 rounded-full border border-yellow-400/20 hover:bg-yellow-400/20 transition-all w-fit"
         >
-          ⚠ Wrong Network — Click to Switch to Arbitrum Sepolia
+          ⚠ Wrong Network — Click to Switch to Mezo Testnet
         </button>
       )}
       <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
@@ -233,7 +233,7 @@ export default function WalletConnect({ className, compact = false }: WalletConn
           {copied ? <CheckCheck className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
         </button>
         <a
-          href={`https://sepolia.arbiscan.io/address/${address}`}
+          href={`https://explorer.mezzo.xyz/address/${address}`}
           target="_blank"
           rel="noopener noreferrer"
           className="p-1 hover:text-cyan-400 transition-colors text-gray-500"

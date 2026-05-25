@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Clock, Zap, TrendingUp, Lock } from "lucide-react";
-import { cn, shortenAddress, formatDuration, formatWeiToEth } from "@/lib/utils";
+import { cn, shortenAddress, formatDuration, formatWeiToBtc } from "@/lib/utils";
 import RevenueProgress from "./RevenueProgress";
 import { REVENUE_CAP_USD } from "@/lib/constants";
 
@@ -18,7 +18,7 @@ export interface CampaignCardData {
   revenueCapWei: bigint;
   active: boolean;
   soldOut: boolean;
-  ethUsdPrice?: number;
+  btcUsdPrice?: number;
 }
 
 interface CampaignCardProps {
@@ -27,9 +27,9 @@ interface CampaignCardProps {
 }
 
 export default function CampaignCard({ campaign, index = 0 }: CampaignCardProps) {
-  const ethUsd = campaign.ethUsdPrice ?? 3000;
-  const priceEth = formatWeiToEth(campaign.priceWei, 4);
-  const priceUsd = ((Number(campaign.priceWei) / 1e18) * ethUsd).toFixed(2);
+  const btcUsd = campaign.btcUsdPrice ?? 100000;
+  const priceBtc = formatWeiToBtc(campaign.priceWei, 8);
+  const priceUsd = ((Number(campaign.priceWei) / 1e18) * btcUsd).toFixed(2);
 
   return (
     <motion.div
@@ -69,7 +69,7 @@ export default function CampaignCard({ campaign, index = 0 }: CampaignCardProps)
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center gap-1.5 text-xs text-gray-400">
               <Zap className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-mono text-white">{priceEth} ETH</span>
+              <span className="font-mono text-white">{priceBtc} BTC</span>
               <span className="text-gray-600">(${priceUsd})</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-gray-400">
@@ -87,12 +87,12 @@ export default function CampaignCard({ campaign, index = 0 }: CampaignCardProps)
             <RevenueProgress
               totalRevenueWei={campaign.totalRevenueWei}
               revenueCapWei={campaign.revenueCapWei}
-              ethUsdPrice={ethUsd}
+              btcUsdPrice={btcUsd}
               showLabels={false}
             />
             <div className="flex justify-between text-xs text-gray-600">
               <span>
-                ${((Number(campaign.totalRevenueWei) / 1e18) * ethUsd).toFixed(2)} earned
+                ${((Number(campaign.totalRevenueWei) / 1e18) * btcUsd).toFixed(2)} earned
               </span>
               <span>${REVENUE_CAP_USD} cap</span>
             </div>
