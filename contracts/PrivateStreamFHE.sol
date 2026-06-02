@@ -2,11 +2,10 @@
 pragma solidity ^0.8.24;
 
 /**
- * @title PrivateStreamFHE
- * @notice Privacy-preserving encrypted video access platform on Arbitrum Sepolia.
- * @dev FHE-inspired architecture — designed for future Fhenix/Zama migration.
+ * @title PrivateStreamArbitrum
+ * @notice Privacy-preserving encrypted video access platform on Arbitrum Sepolia using Microsoft SEAL FHE.
  */
-contract PrivateStreamFHE {
+contract PrivateStreamArbitrum {
 
     struct Campaign {
         uint256 id;

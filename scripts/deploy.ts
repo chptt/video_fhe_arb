@@ -39,12 +39,12 @@ async function main() {
   console.log("  Revenue cap:    ", ethers.formatEther(revenueCapWei), "ETH (~$" + capUsd + ")");
 
   // ── Deploy ───────────────────────────────────────────────────────────────
-  const Factory = await ethers.getContractFactory("PrivateStreamFHE");
+  const Factory = await ethers.getContractFactory("PrivateStreamArbitrum");
   const contract = await Factory.deploy(treasury, feeBps, revenueCapWei);
   await contract.waitForDeployment();
 
   const address = await contract.getAddress();
-  console.log("\n✅ PrivateStreamFHE deployed to:", address);
+  console.log("\n✅ PrivateStreamArbitrum deployed to:", address);
   console.log("\nAdd to .env.local:");
   console.log(`NEXT_PUBLIC_CONTRACT_ADDRESS=${address}`);
 }
