@@ -53,10 +53,8 @@ export default function PurchaseButton({
       toast.loading("Waiting for transaction confirmation...", { id: "purchase" });
 
       // Convert priceWei to string for ethers v6 compatibility
-      // Set explicit gasLimit to bypass estimation failures on Arbitrum
       const tx = await contract.purchaseAccess(campaignId, {
         value: priceWei.toString(),
-        gasLimit: 300000,
       });
       const receipt = await tx.wait();
 
