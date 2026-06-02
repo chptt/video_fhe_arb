@@ -190,7 +190,7 @@ export default function CreateCampaignPage() {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <h1 className="text-3xl font-bold gradient-text">Create Campaign</h1>
         <p className="text-gray-500 mt-1 text-sm">
-          Your video URL will be encrypted with AES-256-GCM before storage on IPFS.
+          Your video URL will be encrypted with Microsoft SEAL FHE before storage on IPFS.
         </p>
       </motion.div>
 
@@ -198,7 +198,7 @@ export default function CreateCampaignPage() {
       <div className="mb-6 p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 flex gap-3">
         <Shield className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
         <div className="text-sm text-gray-400">
-          <span className="text-purple-300 font-medium">FHE-Inspired Privacy: </span>
+          <span className="text-purple-300 font-medium">Microsoft SEAL FHE Privacy: </span>
           Your video URL is encrypted server-side. Only verified buyers can decrypt it.
         </div>
       </div>
