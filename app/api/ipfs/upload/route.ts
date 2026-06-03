@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Could not parse YouTube URL" }, { status: 400 });
     }
 
-    const encryptedVideoUrl = await encryptText(embedUrl);
+    const encryptedVideoUrl = encryptText(embedUrl);
 
     // ── Build metadata JSON ──────────────────────────────────────────────────
     const campaignId = uuidv4();
@@ -79,10 +79,11 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ cid, campaignId });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[ipfs/upload] Error:", err);
+    console.error("[ipfs/upload] Stack:", err?.stack);
     return NextResponse.json(
-      { error: "Failed to upload metadata" },
+      { error: "Failed to upload metadata", details: err?.message || "Unknown error" },
       { status: 500 }
     );
   }

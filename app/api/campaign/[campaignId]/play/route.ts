@@ -6,8 +6,8 @@
  *   1. Wallet address is valid
  *   2. On-chain access is valid and not expired
  *
- * FHE Implementation Note:
- * This endpoint uses TFHE (Fully Homomorphic Encryption) for decryption.
+ * Implementation Note:
+ * This endpoint uses AES-256-GCM for decryption.
  * The server decrypts the video URL only after verifying on-chain access.
  */
 
@@ -49,8 +49,8 @@ export async function GET(
       return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
     }
 
-    // ── Step 3: Decrypt video URL server-side using FHE ──────────────────────
-    const embedUrl = await decryptText(campaign.metadata.encryptedVideoUrl);
+    // ── Step 3: Decrypt video URL server-side using AES-256-GCM ──────────────
+    const embedUrl = decryptText(campaign.metadata.encryptedVideoUrl);
 
     // ── Step 4: Return ONLY the embed URL (never the raw watch URL) ──────────
     return NextResponse.json({
