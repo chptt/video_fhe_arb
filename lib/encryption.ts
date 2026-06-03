@@ -1,10 +1,10 @@
 /**
  * lib/encryption.ts
  *
- * AES-256-GCM encryption utilities for PrivateStream Arbitrum.
+ * Microsoft SEAL (FHE) encryption utilities for PrivateStream Arbitrum.
  *
  * Implementation details:
- *   - AES-256-GCM for authenticated encryption
+ *   - SEAL BFV scheme for encryption
  *   - Server-side key management
  *   - Decryption happens exclusively inside server-side API routes
  *   - Encrypted ciphertext stored on IPFS
@@ -13,77 +13,94 @@
  *           Never import in client components or pages.
  */
 
-import crypto from "crypto";
+import Seal from "node-seal";
 
-const ALGORITHM = "aes-256-gcm";
-const IV_LENGTH = 12; // 96 bits recommended for GCM
+// Cached SEAL instance
+let sealInstance: any = null;
+let context: any = null;
+let secretKey: any = null;
+let publicKey: any = null;
+let encryptor: any = null;
+let decryptor: any = null;
+let batchEncoder: any = null;
+let isInitialized = false;
 
-function getMasterKey(): Buffer {
-  const keyHex = process.env.ENCRYPTION_MASTER_KEY;
-  if (!keyHex) {
-    throw new Error("ENCRYPTION_MASTER_KEY environment variable is not set");
+async function initSeal(): Promise<void> {
+  if (isInitialized) return;
+
+  console.log("🔐 Initializing Microsoft SEAL...");
+  sealInstance = await Seal();
+
+  // Set up BFV parameters with smaller poly modulus for better performance
+  const parms = sealInstance.EncryptionParameters(sealInstance.SchemeType.bfv);
+  parms.setPolyModulusDegree(4096);
+  parms.setCoeffModulus(sealInstance.CoeffModulus.BFVDefault(4096));
+  parms.setPlainModulus(sealInstance.PlainModulus.Batching(4096, 20));
+
+  // Create context
+  context = sealInstance.Context(parms, true, sealInstance.SecurityLevel.none);
+  if (!context.parametersSet()) {
+    throw new Error("Failed to set SEAL parameters");
   }
-  const keyBuffer = Buffer.from(keyHex, "hex");
-  if (keyBuffer.length !== 32) {
-    throw new Error("ENCRYPTION_MASTER_KEY must be 32 bytes (64 hex characters)");
+
+  // Generate keys
+  const keyGenerator = sealInstance.KeyGenerator(context);
+  secretKey = keyGenerator.secretKey();
+  publicKey = keyGenerator.createPublicKey();
+
+  // Create encryptor, decryptor, and encoder
+  encryptor = sealInstance.Encryptor(context, publicKey);
+  decryptor = sealInstance.Decryptor(context, secretKey);
+  batchEncoder = sealInstance.BatchEncoder(context);
+
+  isInitialized = true;
+  console.log("✅ SEAL initialized successfully");
+}
+
+export async function encryptText(plaintext: string): Promise<string> {
+  await initSeal();
+
+  // Encode string to bytes, then to an array of numbers
+  const bytes = new TextEncoder().encode(plaintext);
+  const numArray = Array.from(bytes);
+
+  // Pad to batch size (fill remaining slots with 0)
+  const slotCount = batchEncoder.slotCount();
+  const padded = new Array(slotCount).fill(0);
+  for (let i = 0; i < numArray.length; i++) {
+    padded[i] = numArray[i];
   }
-  return keyBuffer;
+
+  // Encode, encrypt, and serialize
+  const plain = sealInstance.Plaintext();
+  batchEncoder.encode(padded, plain);
+
+  const cipher = sealInstance.Ciphertext();
+  encryptor.encrypt(plain, cipher);
+
+  return cipher.save();
 }
 
-export interface EncryptedPayload {
-  iv: string;
-  ciphertext: string;
-  authTag: string;
-}
+export async function decryptText(ciphertextBase64: string): Promise<string> {
+  await initSeal();
 
-/**
- * Encrypts a plaintext string with AES-256-GCM.
- * @param plaintext - The string to encrypt
- * @returns Encrypted payload with iv, ciphertext, authTag (base64 encoded)
- */
-export function encryptText(plaintext: string): EncryptedPayload {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const key = getMasterKey();
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+  // Deserialize ciphertext
+  const cipher = sealInstance.Ciphertext();
+  cipher.load(context, ciphertextBase64);
 
-  let encrypted = cipher.update(plaintext, "utf8", "base64");
-  encrypted += cipher.final("base64");
+  // Decrypt and decode
+  const plain = sealInstance.Plaintext();
+  decryptor.decrypt(cipher, plain);
 
-  const authTag = cipher.getAuthTag();
+  const decodedArray = batchEncoder.decode(plain);
 
-  return {
-    iv: iv.toString("base64"),
-    ciphertext: encrypted,
-    authTag: authTag.toString("base64"),
-  };
-}
+  // Find the end of the actual data (before trailing zeros)
+  let end = decodedArray.length;
+  while (end > 0 && decodedArray[end - 1] === 0) {
+    end--;
+  }
 
-/**
- * Decrypts an AES-256-GCM payload.
- * @param payload - Encrypted payload object
- * @returns Decrypted plaintext string
- */
-export function decryptText(payload: EncryptedPayload): string {
-  const key = getMasterKey();
-  const decipher = crypto.createDecipheriv(
-    ALGORITHM,
-    key,
-    Buffer.from(payload.iv, "base64")
-  );
-
-  decipher.setAuthTag(Buffer.from(payload.authTag, "base64"));
-
-  let decrypted = decipher.update(payload.ciphertext, "base64", "utf8");
-  decrypted += decipher.final("utf8");
-
-  return decrypted;
-}
-
-/**
- * Generates a secure random 256-bit (32-byte) key for ENCRYPTION_MASTER_KEY.
- * Run this once locally and store the result in your .env file.
- * Never commit this key to git!
- */
-export function generateMasterKey(): string {
-  return crypto.randomBytes(32).toString("hex");
+  // Convert back to bytes and string
+  const resultBytes = new Uint8Array(decodedArray.slice(0, end));
+  return new TextDecoder().decode(resultBytes);
 }

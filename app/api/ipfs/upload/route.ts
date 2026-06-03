@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Could not parse YouTube URL" }, { status: 400 });
     }
 
-    const encryptedVideoUrl = encryptText(embedUrl);
+    const encryptedVideoUrl = await encryptText(embedUrl);
 
     // ── Build metadata JSON ──────────────────────────────────────────────────
     const campaignId = uuidv4();

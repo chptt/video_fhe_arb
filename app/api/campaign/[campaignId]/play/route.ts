@@ -49,8 +49,8 @@ export async function GET(
       return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
     }
 
-    // ── Step 3: Decrypt video URL server-side using AES-256-GCM ──────────────
-    const embedUrl = decryptText(campaign.metadata.encryptedVideoUrl);
+    // ── Step 3: Decrypt video URL server-side using SEAL FHE ─────────────────
+    const embedUrl = await decryptText(campaign.metadata.encryptedVideoUrl);
 
     // ── Step 4: Return ONLY the embed URL (never the raw watch URL) ──────────
     return NextResponse.json({
