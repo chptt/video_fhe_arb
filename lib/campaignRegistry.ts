@@ -10,13 +10,12 @@
 
 import { fetchCampaignOnChain, getTotalCampaigns, OnChainCampaign } from "./arbitrum";
 import { fetchFromIPFS } from "./ipfs";
-import type { EncryptedPayload } from "./encryption";
 
 export interface CampaignMetadata {
   campaignId: string;
   title: string;
   description: string;
-  encryptedVideoUrl: EncryptedPayload;
+  encryptedVideoUrl: string;
   creatorAddress: string;
   priceWei: string;
   durationSeconds: number;
