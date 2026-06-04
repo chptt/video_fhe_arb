@@ -34,6 +34,7 @@ yarn-error.log*
 .env
 .env.local
 .env.vercel
+.env.railway
 .env.development.local
 .env.test.local
 .env.production.local
